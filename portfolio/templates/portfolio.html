@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>Portfolio</title>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<style>
+article, aside, dialog, figure, footer, header,
+hgroup, menu, nav, section {display:block;}
+html,body{height:100%;}
+body{
+	margin:0;
+	width:100%;
+	font-family: 'Inconsolata', 'migu1m', sans-serif;
+	color:rgb(122,95,96);
+	background: url(/static/img/afternoon2.jpg);
+	background-repeat: no-repeat;
+	background-size:150% 150%;
+}
+.body-span{
+	position: fixed;
+	background-color:rgb(7, 12, 19);
+	height:20%;
+	width:100%;
+	z-index:1;
+}
+.clip{
+	position: absolute;
+	left: -130px;
+	width:127px;
+	height:55px;
+	line-height: 55px;
+	user-select: none;
+	clip-path: polygon(0 0, 100% 15%, 100% 100%, 0% 85%);
+	z-index:-1;
+	color:white;
+	padding: 5px;
+}
+.clip b{
+	margin-left: 10px;
+	font-size: 20px;
+}
+.clip-color0{background-color:rgba(0, 220, 255, 0.4);}
+.clip-color1{background-color:rgba(0, 43, 255, 0.4);}
+
+{% for item in items %}
+.view-{{item.label}}:not(.on):not(.selected):hover{
+{% if item.thumbnail|length == 0 %}
+	background-color:rgb(109, 153, 191,0.6);
+{% else %}
+	background: url(/static/img/{{item.thumbnail}});
+	background-repeat: no-repeat;
+	background-size: 100% 100%;
+	color:black;
+{% endif %}
+	cursor:pointer;
+}
+{% endfor %}
+.container {
+	position: absolute;
+	/* margin: auto; */
+	top: 0; bottom: 0;
+	left: -50px; right: 0;
+	width: 680px; height: 800px;
+	transform: scale(0.8);
+}
+.page{
+	transform-origin: 100.3% 100.3%;
+	position: absolute;
+    width: 100%;
+    height: 100%;
+}
+.front-page {
+	z-index: 2;
+	width: 100%;
+	height: 100%;
+	background: rgba(255, 165, 1, 0.5);
+	border-radius: 15px 15px 15px 15px;
+	text-align: center;
+}
+.inner-page{
+    top: 4px;
+    left: -7px;
+    background:#FFEFCE;
+    border-radius: 13px 13px 13px 20px;
+}
+.back-page {
+	z-index: -50;
+    top: 10px;
+    left: -16px;
+    background:rgba(255, 165, 1, 0.5);
+    border-radius: 13px 13px 13px 20px;
+}
+.reverse-page {
+	transform: rotateY(180deg);
+	height: 100%;
+	width: 93%;
+	margin-right:7%;
+	padding:6px;
+}
+.normal-page {
+	height: 100%;
+	width: 93%;
+	margin-right:7%;
+	padding:6px;
+}
+.left{transform: rotateY(0deg);}
+.selected{z-index:1;}
+.shadow-page {
+	z-index: -100;
+	top: 18px; left: -27px;
+	background: #666;
+	opacity: 0.3;
+	border-radius: 13px 13px 13px 20px;
+}
+.ring{
+	z-index:2;
+	position: absolute;
+	top: 15px; right: 15px;
+	width: 25px; height: 25px;
+	background: #FFF;
+	border-radius: 100%;
+}
+.inner-ring{
+	z-index:1;
+}
+.bar{
+	z-index:0;
+	position: absolute;
+	top: 24px; right: -10px;
+	width: 36px; height: 10px;
+	background: rgba(49, 144, 115, 0.7);
+	border-radius: 10px;
+}
+.front-bar{
+	z-index:3;
+}
+.inner-bar{
+	z-index:1;
+	top:21px;
+}
+.bookmark{
+	position: absolute;
+	top: -20px; left: 30px;
+	width: 30px; height: 30px;
+	background: #FFD97D;
+}
+/* .close-event:hover{
+	cursor: pointer;
+} */
+.square_btn{
+    display: inline-block;
+    padding: 7px 20px;
+	border-radius: 25px;
+    text-decoration: none;
+    color: #FFF;
+    background-image: -webkit-linear-gradient(45deg, #FFC107 0%, #ff8b5f 100%);
+    background-image: linear-gradient(45deg, #FFC107 0%, #ff8b5f 100%);
+    transition: .4s;
+}
+
+.square_btn:hover {
+    background-image: -webkit-linear-gradient(45deg, #FFC107 0%, #f76a35 100%);
+    background-image: linear-gradient(45deg, #FFC107 0%, #f76a35 100%);
+}
+</style>
+<script>
+	var userAgent = '';
+	var closing = false;
+	var openning = false;
+	jQuery(function(){
+		userAgent = getUserAgent();
+
+		jQuery('#main-form').submit(function() {
+			jQuery.ajax({
+			type:"POST",
+			url:"{% url 'login_portfoliio' %}",
+			data:jQuery("form#main-form").serialize(),
+			}).success(function(data){
+				jQuery("#main").html(jQuery(data).filter('#main').html());
+				enterSite();
+			}).fail(function(XMLHttpRequest, textStatus, errorThrown){
+				alert('ログインに失敗しました');
+			});
+			return false;
+		});
+	});
+
+	function getUserAgent(){
+		var ua = window.navigator.userAgent.toLowerCase();
+
+		if(ua.indexOf('iphone') !== -1 || ua.indexOf('ipod') !== -1 ) return 'iphone';
+		else if (ua.indexOf('ipad')    !== -1) return 'ipad';
+		else if (ua.indexOf('android') !== -1) return 'android';
+		else if (ua.indexOf('windows') !== -1 && ua.indexOf('phone') !== -1) return 'windows_phone';
+		else return '';
+	}
+
+	function isSmartPhone(){
+		return userAgent == 'iphone' || userAgent == 'ipad' || userAgent == 'android' || userAgent == 'windows_phone';
+	}
+
+	// リサイズレイアウト調整
+	var timer = false;
+	jQuery(window).resize(function() {
+		if (timer !== false) {
+			clearTimeout(timer);
+		}
+		timer = setTimeout(function() {
+			setContentCenter();
+		}, 400);
+	});
+
+	function setContentCenter(){
+		jQuery('.container').css({
+			left: ((jQuery(window).width() - (jQuery('.container').width())) / 4) + 'px'
+			, top: ((jQuery(window).height() - jQuery('.container').height()) / 2) + 'px'
+		});
+	}
+
+	// Menu開く
+	function enterSite(){
+		makeRing(21, 15, 'front-ring');
+		makeRing(21, 15, 'inner-ring');
+		makeBar(21, 21, 'inner-bar');
+		makeBar(21, 24, 'front-bar');
+
+		jQuery('#input').remove();
+
+		jQuery('#main-form').animate({
+			'width' : 0
+		}, 900);
+		var container = jQuery('.container');
+		var top = ((jQuery(window).height() - container.height()) / 2);
+		var left = ((jQuery(window).width() - (container.width())) / 4);
+		container.css({'top':top+'px'}).animate({
+			'left': left + 'px'
+		},1000);
+
+		// ポートフォリオ開く処理を埋め込む
+		if(!isSmartPhone()){
+			jQuery(document).on('click', '.item-clip:not(.selected)', function(){
+				if(closing) return;
+				openPage(jQuery(this));
+			});
+		}else{
+			jQuery(document).on('touchstart', '.item-clip:not(.selected)', function(){
+				if(closing) return;
+				openPage(jQuery(this));
+			});
+		}
+
+		// ポートフォリオ閉じる処理を埋め込む
+		if(!isSmartPhone()){
+			jQuery(document).on('click', '.close-event', function(){
+				if(openning) return;
+				closePortfolio();
+			});
+		}else{
+			jQuery(document).on('touchstart', '.close-event', function(){
+				if(openning) return;
+				closePortfolio();
+			});
+		}
+
+		// setContentCenter();
+
+		createMenu();
+		
+		jQuery('.contents').animate({opacity: '1'}, 600);
+	}
+
+	var itemsList = {};
+	var subItems = {};
+	// Menu作成
+	function createMenu(){
+		// 二次元連想配列 [key=付箋(大分類), value=[key=付箋(小分類), value=ifame用url]] を作成
+		{% for item in items %}
+			var item = itemsList['{{item.item_type}}'.toLowerCase()];
+			if(!item){
+				item = {};
+				itemsList['{{item.item_type}}'.toLowerCase()] = item;
+			}
+			item['{{item.label}}'] = '{{item.url}}';
+			subItems['{{item.label}}'] = '{{item.url_sub}}';
+		{% endfor %}
+
+		// 付箋のhtml生成
+		var headerHtmls = [];
+		var menuHtmls = [];
+		var headerCount = 0;
+		var count = 0;
+		var marginTop = 20;
+		var headerMargin = 70;
+		var itemHeight = 55;
+		var margin = 15;
+		{% for itemHeader in itemHeaders %}
+			headerHtmls.push('<div id="' + '{{itemHeader.label}}'.toLowerCase() + '" class="clip header-clip" style="height:55px;' + '{{itemHeader.attributes}}' + 
+							'top:' +  ((count++ * (itemHeight + margin) + marginTop) + (headerCount++ * headerMargin)) + 'px;">');
+			headerHtmls.push('<b style="color:white;">{{itemHeader.label}}</b>');
+			headerHtmls.push('</div>');
+			var items = itemsList['{{itemHeader.label}}'.toLowerCase()];
+			for(var key in items){
+				headerHtmls.push('<div id="' + key + '"'
+				 + ' class="clip item-clip clip-color' + (count % 2) + (isSmartPhone() ? '"' : ' view-' + key + '"')
+				 + ' style="top:' + ((count++ * (itemHeight + margin) + marginTop) + ((headerCount - 1) * headerMargin))  + 'px;height:' + itemHeight + 'px;line-height:' + itemHeight + 'px;">'
+				 + '<b>' + key + '</b>'
+				 + '</div>')
+			}
+		{% endfor %}
+		jQuery('.container').append(headerHtmls.join(''));
+	}
+
+	// ポートフォリオ開く
+	function openPage(clipJElm){
+		openning = true;
+
+		var moveType = 'open';
+
+		// 表紙
+		var frontPage = jQuery('#front-page');
+		if(frontPage.hasClass('left')){
+			frontPage.removeClass('left').addClass('right');
+			turnOverPage(moveType, frontPage, 90, 5, 1000);
+		}
+
+		// 内部ページ
+		var pageJElm = jQuery('.left:not(.right)');
+		pageJElm.removeClass('left').addClass('right').addClass('moving');
+		openLeftIframe(clipJElm);
+		setTimeout(function(){
+			turnOverPage(moveType, pageJElm, 90, 3, 1000, clipJElm);
+    	},200);
+	}
+
+    // ポートフォリオ閉じる
+	function closePortfolio(){
+		closing = true;
+		
+		jQuery('#close').removeClass('close-event');
+
+		var moveType = 'close';
+
+		// 内部ページ
+		var rightPageJElm = jQuery('.right:not(#front-page)');
+		turnOverPage(moveType, rightPageJElm, 90, 5, 700);
+
+		// 表紙
+		var frontPageJElm = jQuery('#front-page');
+		turnOverPage(moveType, frontPageJElm, 90, 3, 1000);
+	}
+
+	// めくる(90度ずつ。ifameにtransform-visiblityが効かない為)
+	function turnOverPage(moveType, pageJElm, deg, zIndex, duration, clipJElm){
+		var tmpCss = zIndex ? {'zIndex' : zIndex} : {};
+
+		setTimeout(function(){
+			if(moveType == 'open' && pageJElm.attr('id') != 'front-page' && deg == 90){
+				jQuery('.selected').removeClass('selected');
+				clipJElm.addClass('selected');
+			}
+			pageJElm.css(tmpCss).animate({'count' : deg},{
+				duration: duration
+				, step: function(now, fx){
+					pageJElm.css({transform :'rotateY(' + now + 'deg)'});
+				}
+				, complete:function(){
+					completeProcess(moveType, pageJElm, deg, clipJElm);
+					
+					if(deg == 90) turnOverPage(moveType, pageJElm, (moveType == 'open' ? 180 : 0), null, 1000, clipJElm);
+				}
+			});
+		},(pageJElm.attr('id') == 'front-page' || moveType == 'close' ? 0 :300));
+	}
+
+	// ポートフォリオ開閉時の処理
+	var rightPageZindex = 3;
+	function completeProcess(moveType, pageJElm, deg, clipJElm){
+		var isOpen = moveType == 'open';
+		var isFrontPage = pageJElm.attr('id') == 'front-page';
+
+		if(isOpen){
+			if(isFrontPage){
+				if(deg == 90){
+					jQuery('#front-page').css('zIndex', -50);
+				}else{
+					// to 180 deg
+					jQuery('#close').addClass('close-event');
+					return;
+				}
+			}else{
+				if(deg == 90){
+					pageJElm.css({'zIndex' : ++rightPageZindex});
+					pageJElm.find('iframe').parent().remove();
+					
+					openRightIframe(pageJElm, clipJElm);
+				}else{
+					// to 180 deg
+					jQuery('.right:not(.moving):not(#front-page)').remove();
+					pageJElm.removeClass('moving');
+
+					if(pageJElm.css('zIndex') == rightPageZindex) openning = false;
+				}
+			}
+		}else{
+			// close
+			if(isFrontPage){
+				if(deg == 90){
+					jQuery('#front-page').css('zIndex', 5);
+				}else{
+					// to 0 deg
+					pageJElm.removeClass('right').addClass('left');
+					closing = false;
+				}
+			}else{
+				if(deg == 90){
+					pageJElm.css({'zIndex' : 4});
+					pageJElm.find('iframe').parent().remove();
+				}else{
+					// to 0 deg
+					jQuery('.left').find('iframe').parent().remove();
+					jQuery('.selected').removeClass('selected');
+					jQuery('.right:not(#front-page)').remove();
+				}
+			}
+		}
+	}
+
+	// 左ページiframe開く
+	function openLeftIframe(pageJElm){
+		var items = {};
+		for(var key in itemsList){
+			jQuery.extend(items, itemsList[key]);
+		}
+		var openViewHtmls = [];
+		openViewHtmls.push('<div class="page inner-page left">');
+		openViewHtmls.push('<div class="normal-page">');
+		var viewId = pageJElm.attr('id');
+		if(items[viewId]) openViewHtmls.push('<iframe width="100%" height="100%" src="' + items[viewId] + '" frameborder="0"></iframe>');
+		openViewHtmls.push('</div>');
+		openViewHtmls.push('<div id="inner-ring" class="ring inner-ring"></div>');
+		openViewHtmls.push('<div id="inner-bar" class="bar inner-bar" ></div>');
+		openViewHtmls.push('</div>');
+
+		jQuery('#inner-ring').removeAttr('id');
+		jQuery('#inner-bar').removeAttr('id');
+		jQuery("#front-page").after(openViewHtmls.join(""));
+		makeRing(21, 15, 'inner-ring');
+		makeBar(21, 21, 'inner-bar');
+	}
+
+	// 右ページiframe開く
+	function openRightIframe(pageJElm, clipJElm){
+		var openViewHtmls = [];
+		var viewId = clipJElm.attr('id');
+		openViewHtmls.push('<div class="reverse-page">');
+		if(viewId && subItems[viewId]) {
+			openViewHtmls.push('<iframe width="100%" height="100%" src="' + subItems[viewId] + '" frameborder="0"></iframe>');
+		}
+		openViewHtmls.push('</div>');
+		pageJElm.append(openViewHtmls.join(""));
+	}
+
+	function makeRing(num, top, elmId) {
+		if (num > 0) {
+			top += 35;
+			var ring = '<div class="ring ' + elmId + '" id="ring' + num + '" style="top:' +  top + 'px;"> </div>'
+			jQuery('#' + elmId).after(ring);
+			num--;
+			makeRing(num, top, elmId);
+		}
+	}
+	
+	function makeBar(num, top, elmId) {
+		if (num > 0) {
+			top += 35;
+			var bar = '<div class="bar ' + elmId + ' " style="top:' +  top + 'px;"> </div>'
+			jQuery('#' + elmId).after(bar);
+			num--;
+			makeBar(num, top, elmId);
+		}
+	}
+</script>
+</head>
+<body>
+	<div id="main" style="width:100%;height:100%;">
+		{% if result == 'success' %}
+		<div class="container" style="left:2200px;">
+			<!-- <div class="bookmark"></div> -->
+			<div id="front-page" class="page front-page left">
+				<h1 style="margin-top:150px;font-size:55px;color:white;font-family:cursive;">~Portfolio~</h1>
+				<div id="front-ring" class="ring front-ring"></div>
+				<div id="front-bar" class="bar front-bar" ></div>
+				<span id="close" style="position:absolute;left:0px;top:0px;height:60px;width:60px;"></span>
+			</div>
+			<div class="page inner-page left">
+				<div id="inner-ring" class="ring inner-ring"></div>
+				<div id="inner-bar" class="bar inner-bar" ></div>
+			</div>
+			<span id="back-page" class="page back-page"></span>
+			<span class="page shadow-page"></span>
+		</div>
+		{% endif %}
+		<form id="main-form" action="" method="POST" style="text-align:center;width:100%;height:100%;background-color:rgba(0, 202, 118, 0.5)">
+			{% csrf_token %}
+			<span id="input" style="line-height:50">
+			{{form.password}}<input type="submit" value="Go" class="square_btn"></input>
+			</span>
+		</form>
+	</div>
+	
+</body>
+</html>
